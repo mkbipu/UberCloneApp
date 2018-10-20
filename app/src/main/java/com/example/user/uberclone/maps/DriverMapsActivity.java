@@ -77,25 +77,18 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
 
     private void getAssignedCustomer(){
         String driverId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference assignedCustomerRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverId);
+        DatabaseReference assignedCustomerRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverId).child("customerRideId");
 
         assignedCustomerRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
-                    Map<String,Object> map = (Map<String,Object>) dataSnapshot.getValue();
-
-                    if (map.get("customerRideId")!=null){
-                        customerId = map.get("customerRideId").toString();
-
-                        getAssignedCustomerPickupLocation();
-                    }
+                    customerId = dataSnapshot.getValue().toString();
+                    getAssignedCustomerPickupLocation();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }

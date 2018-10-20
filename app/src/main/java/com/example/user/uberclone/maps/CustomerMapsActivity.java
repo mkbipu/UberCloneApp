@@ -157,7 +157,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     }
 
 
-private Marker mDriverMarker;
+    private Marker mDriverMarker;
     private void getDriverLocation(){
         DatabaseReference driverLocationRef = FirebaseDatabase.getInstance().getReference().child("driversWorking").child(driverFoundID).child("l");
 
@@ -184,6 +184,18 @@ private Marker mDriverMarker;
                     {
                         mDriverMarker.remove();
                     }
+
+                    Location loc1 = new Location("");
+                    loc1.setLatitude(pickupLocation.latitude);
+                    loc1.setLongitude(pickupLocation.longitude);
+
+                    Location loc2 = new Location("");
+                    loc2.setLatitude(driverLatLng.latitude);
+                    loc2.setLongitude(driverLatLng.longitude);
+
+                    float distance = loc1.distanceTo(loc2);
+                    mRequest.setText("Driver found: " + String.valueOf(distance));
+
 
                     mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("your driver"));
                 }
