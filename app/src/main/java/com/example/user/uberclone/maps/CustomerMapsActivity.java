@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.user.uberclone.CustomerSettingsActivity;
 import com.example.user.uberclone.MainActivity;
 import com.example.user.uberclone.R;
 import com.firebase.geofire.GeoFire;
@@ -48,7 +49,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     Location mLastLocation;
     LocationRequest mLocationRequest;
 
-    private Button mLogout, mRequest;
+    private Button mLogout, mRequest, mSettings;
 
     private LatLng pickupLocation;
     private Boolean requestBol = false;
@@ -65,6 +66,7 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
         mLogout = findViewById(R.id.logout);
         mRequest = findViewById(R.id.request);
+        mSettings = findViewById(R.id.setting);
 
         mLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,8 +126,20 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
                 }
             }
         });
-    }
 
+
+
+
+        mSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CustomerMapsActivity.this, CustomerSettingsActivity.class);
+                startActivity(intent);
+                return;
+
+            }
+        });
+    }
 
 
     private int radius = 1;
