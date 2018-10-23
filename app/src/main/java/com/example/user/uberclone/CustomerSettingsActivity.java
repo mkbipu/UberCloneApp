@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -150,8 +151,8 @@ public class CustomerSettingsActivity extends AppCompatActivity {
 
         if (resultUri != null) {
 
-          final StorageReference filePath = FirebaseStorage.getInstance().getReference().child("profile_images").child(userID);
-            Bitmap bitmap = null;
+         final StorageReference filePath = FirebaseStorage.getInstance().getReference().child("profile_images").child(userID);
+         Bitmap bitmap = null;
 
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getApplication().getContentResolver(), resultUri);
@@ -163,22 +164,12 @@ public class CustomerSettingsActivity extends AppCompatActivity {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
 
             byte[] data = baos.toByteArray();
-            final UploadTask uploadTask = filePath.putBytes(data);
+           final UploadTask uploadTask = filePath.putBytes(data);
 
-
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-
-                    finish();
-                    return;
-                }
-            });
-
-            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+           uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                           filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
                             Map newImage = new HashMap();
@@ -186,22 +177,32 @@ public class CustomerSettingsActivity extends AppCompatActivity {
 
                             mCustomerDatabase.updateChildren(newImage);
 
+                            Toast.makeText(CustomerSettingsActivity.this, "User Image Upload Successful", Toast.LENGTH_SHORT).show();
+
                             finish();
                             return;
                         }
                     });
                 }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    finish();
+                    return;
+                }
             });
-
         } else {
 
             finish();
         }
     }
+
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == 1 && resultCode == Activity.RESULT_OK){
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK){
             final Uri imageUri = data.getData();
             resultUri = imageUri;
             mProfileImage.setImageURI(resultUri);
