@@ -49,6 +49,7 @@ public class CustomerSettingsActivity extends AppCompatActivity {
 
     private Uri resultUri;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +72,7 @@ public class CustomerSettingsActivity extends AppCompatActivity {
 
         getUserInfo();
 
+
         mProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,14 +81,12 @@ public class CustomerSettingsActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
-
         mConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 saveUserInformation();
             }
         });
-
         mBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,49 +94,43 @@ public class CustomerSettingsActivity extends AppCompatActivity {
                 return;
             }
         });
-
     }
 
 
-    private void getUserInfo(){
-             mCustomerDatabase.addValueEventListener(new ValueEventListener() {
-                 @Override
-                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                     if (dataSnapshot.exists() && dataSnapshot.getChildrenCount()>0){
-                         Map<String ,Object> map = ( Map<String ,Object>) dataSnapshot.getValue();
+    private void getUserInfo() {
+        mCustomerDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
+                    Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
 
-                         if (map.get("name")!= null){
-                             mName = map.get("name").toString();
-                             mNameField.setText(mName);
-                         }
+                    if (map.get("name") != null) {
+                        mName = map.get("name").toString();
+                        mNameField.setText(mName);
+                    }
 
-                         if (map.get("phone")!= null){
-                             mPhone = map.get("phone").toString();
-                             mPhoneField.setText(mPhone);
-                         }
+                    if (map.get("phone") != null) {
+                        mPhone = map.get("phone").toString();
+                        mPhoneField.setText(mPhone);
+                    }
 
-                         if (map.get("profileImageUrl")!= null){
-                             mProfileImageUrl = map.get("profileImageUrl").toString();
+                    if (map.get("profileImageUrl") != null) {
+                        mProfileImageUrl = map.get("profileImageUrl").toString();
 
-                             Glide
-                                     .with(getApplication())
-                                     .load(mProfileImageUrl)
-                                     .into(mProfileImage);
-                         }
-                     }
-                 }
+                        Glide
+                                .with(getApplication())
+                                .load(mProfileImageUrl)
+                                .into(mProfileImage);
+                    }
+                }
+            }
 
-                 @Override
-                 public void onCancelled(@NonNull DatabaseError databaseError) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                 }
-             });
+            }
+        });
     }
-
-
-
-
-
 
 
     private void saveUserInformation() {
@@ -151,8 +145,8 @@ public class CustomerSettingsActivity extends AppCompatActivity {
 
         if (resultUri != null) {
 
-         final StorageReference filePath = FirebaseStorage.getInstance().getReference().child("profile_images").child(userID);
-         Bitmap bitmap = null;
+            final StorageReference filePath = FirebaseStorage.getInstance().getReference().child("profile_images").child(userID);
+            Bitmap bitmap = null;
 
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getApplication().getContentResolver(), resultUri);
@@ -164,12 +158,12 @@ public class CustomerSettingsActivity extends AppCompatActivity {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
 
             byte[] data = baos.toByteArray();
-           final UploadTask uploadTask = filePath.putBytes(data);
+            final UploadTask uploadTask = filePath.putBytes(data);
 
-           uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                           filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
                             Map newImage = new HashMap();
@@ -198,11 +192,10 @@ public class CustomerSettingsActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK){
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             final Uri imageUri = data.getData();
             resultUri = imageUri;
             mProfileImage.setImageURI(resultUri);
