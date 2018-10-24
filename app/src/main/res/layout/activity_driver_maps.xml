@@ -41,11 +41,19 @@
             android:paddingLeft="40sp">
 
             <TextView
+                android:id="@+id/customerDestination"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="20sp"
+                android:text="Destination: --"/>
+
+            <TextView
                 android:id="@+id/customerName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="20sp"
                 android:paddingBottom="10sp" />
+
 
             <TextView
                 android:id="@+id/customerPhone"

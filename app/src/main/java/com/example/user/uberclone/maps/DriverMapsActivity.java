@@ -61,7 +61,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
     private LinearLayout mCustomerInfo;
     private ImageView mCustomerProfileImage;
 
-    private TextView mCustomerName, mCustomerPhone;
+    private TextView mCustomerName, mCustomerPhone, mCustomerDestination;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +78,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
 
         mCustomerName = findViewById(R.id.customerName);
         mCustomerPhone = findViewById(R.id.customerPhone);
+        mCustomerDestination = findViewById(R.id.customerDestination);
 
         mLogout = findViewById(R.id.logout);
 
@@ -101,7 +102,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
 
     private void getAssignedCustomer() {
         String driverId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference assignedCustomerRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverId).child("customerRideId");
+        DatabaseReference assignedCustomerRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverId).child("customerRequest").child("customerRideId");
 
         assignedCustomerRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -109,6 +110,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
                 if (dataSnapshot.exists()) {
                     customerId = dataSnapshot.getValue().toString();
                     getAssignedCustomerPickupLocation();
+                    getAssignedCustomerDestination();
                     getAssignedCustomerInfo();
                 } else {
                     customerId = "";
@@ -122,6 +124,8 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
                     mCustomerInfo.setVisibility(View.GONE);
                     mCustomerName.setText("");
                     mCustomerPhone.setText("");
+                    mCustomerDestination.setText("Destination: --");
+
                     mCustomerProfileImage.setImageResource(R.drawable.user);
 
                 }
@@ -169,6 +173,31 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
         });
 
     }
+
+
+    private void getAssignedCustomerDestination() {
+        String driverId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference assignedCustomerRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverId).child("customerRequest").child("destination");
+
+        assignedCustomerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String destination = dataSnapshot.getValue().toString();
+                    mCustomerDestination.setText("Destination: " + destination);
+
+                } else {
+                    mCustomerDestination.setText("Destination: --");
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+    }
+
 
     private void getAssignedCustomerInfo() {
         mCustomerInfo.setVisibility(View.VISIBLE);
@@ -290,6 +319,9 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
         GeoFire geoFire = new GeoFire(ref);
         geoFire.removeLocation(userId);
     }
+
+
+
 
     @Override
     protected void onStop() {
