@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.user.uberclone.DriverSettingsActivity;
 import com.example.user.uberclone.MainActivity;
 import com.example.user.uberclone.R;
 import com.firebase.geofire.GeoFire;
@@ -52,7 +53,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
     Location mLastLocation;
     LocationRequest mLocationRequest;
 
-    private Button mLogout;
+    private Button mLogout, mSettings;
 
     private String customerId = "";
     private Boolean isLoggingOut = false;
@@ -87,6 +88,7 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
         mCustomerPhone = findViewById(R.id.customerPhone);
         mCustomerDestination = findViewById(R.id.customerDestination);
 
+        mSettings = findViewById(R.id.settings);
         mLogout = findViewById(R.id.logout);
 
         mLogout.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +101,15 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
                 Intent intent = new Intent(DriverMapsActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
+                return;
+            }
+        });
+
+        mSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DriverMapsActivity.this, DriverSettingsActivity.class);
+                startActivity(intent);
                 return;
             }
         });

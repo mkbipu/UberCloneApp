@@ -18,6 +18,13 @@
         android:layout_height="wrap_content"
         android:text="LogOut" />
 
+    <Button
+        android:id="@+id/settings"
+        android:layout_gravity="right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings" />
+
     <LinearLayout
         android:id="@+id/customerInfo"
         android:layout_width="match_parent"
@@ -45,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="20sp"
-                android:text="Destination: --"/>
+                android:text="Destination: --" />
 
             <TextView
                 android:id="@+id/customerName"
