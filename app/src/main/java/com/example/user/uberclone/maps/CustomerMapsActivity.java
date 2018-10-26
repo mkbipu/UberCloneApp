@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,13 +70,15 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
     private  Marker pickupMarker;
     private SupportMapFragment mapFragment;
 
-    private String destination;
+    private String destination, requestService;
 
     private LinearLayout mDriverInfo;
 
     private ImageView mDriverProfileImage;
 
     private TextView mDriverName, mDriverPhone, mDriverCar;
+
+    private RadioGroup mRadioGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +102,8 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
         mDriverPhone = findViewById(R.id.driverPhone);
         mDriverCar = findViewById(R.id.driverCar);
 
-
+        mRadioGroup = findViewById(R.id.radiopGroup);
+        mRadioGroup.check(R.id.UberX);
 
         mLogout = findViewById(R.id.logout);
         mRequest = findViewById(R.id.request);
@@ -155,6 +160,16 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
 
 
                 }else {
+                    int selectId = mRadioGroup.getCheckedRadioButtonId();
+
+                    final RadioButton radioButton =  findViewById(selectId);
+
+                    if (radioButton.getText() == null){
+                        return;
+                    }
+
+                    requestService = radioButton.getText().toString();
+
                     requestBol = true;
 
                     String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -226,26 +241,55 @@ public class CustomerMapsActivity extends FragmentActivity implements OnMapReady
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
 
-                if (!driverFound && requestBol)
-                {
-                    driverFound = true;
-                    driverFoundID = key;
+                if (!driverFound && requestBol) {
+                    DatabaseReference mCustomerDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(key);
+                    mCustomerDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists() && dataSnapshot.getChildrenCount()>0){
 
-                    DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
-                            .child("Users")
-                            .child("Drivers")
-                            .child(driverFoundID)
-                            .child("customerRequest");
+                                Map<String, Object> driverMap = (Map<String, Object>) dataSnapshot.getValue();
 
-                    String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    HashMap map = new HashMap();
-                    map.put("customerRideId", customerId);
-                    map.put("destination", destination);
-                    driverRef.updateChildren(map);
+                                if (driverFound){
+                                    return;
+                                }
 
-                    getDriverLocation();
-                    getDriverInfo();
-                    mRequest.setText("Looking for driver location...");
+                                if (driverMap.get("service").equals(requestService)) {
+
+
+                                    driverFound = true;
+                                    driverFoundID = dataSnapshot.getKey();
+
+                                    DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference()
+                                            .child("Users")
+                                            .child("Drivers")
+                                            .child(driverFoundID)
+                                            .child("customerRequest");
+
+                                    String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                    HashMap map = new HashMap();
+                                    map.put("customerRideId", customerId);
+                                    map.put("destination", destination);
+                                    driverRef.updateChildren(map);
+
+                                    getDriverLocation();
+                                    getDriverInfo();
+                                    mRequest.setText("Looking for driver location...");
+                                }
+
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
+
                 }
             }
 
